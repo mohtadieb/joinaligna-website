@@ -1,198 +1,663 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aligna — Relationship Insight App</title>
+  <meta
+    name="description"
+    content="Aligna helps couples discover deeper relationship insights through guided conversations, shared sessions, and AI-powered reflections."
+  />
 
-<title>Aligna — Relationship Insight App</title>
+  <style>
+    :root {
+      --bg: #f8f5ff;
+      --card: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(255, 255, 255, 0.45);
+      --text: #221b38;
+      --muted: #6b6480;
+      --purple: #7b5cf0;
+      --pink: #e96bd2;
+      --orange: #ffa96c;
+      --shadow: 0 18px 50px rgba(75, 45, 140, 0.14);
+      --shadow-soft: 0 12px 30px rgba(75, 45, 140, 0.10);
+      --radius-xl: 30px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --gradient: linear-gradient(135deg, #7b5cf0 0%, #e96bd2 52%, #ffa96c 100%);
+    }
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
+    html {
+      scroll-behavior: smooth;
+    }
 
-body{
-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto;
-margin:0;
-background:#fafafa;
-color:#222;
-}
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(123, 92, 240, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(255, 169, 108, 0.20), transparent 28%),
+        radial-gradient(circle at 50% 20%, rgba(233, 107, 210, 0.14), transparent 30%),
+        var(--bg);
+      line-height: 1.6;
+    }
 
-.container{
-max-width:1100px;
-margin:auto;
-padding:40px;
-}
+    img {
+      max-width: 100%;
+      display: block;
+    }
 
-.hero{
-text-align:center;
-padding:140px 20px;
-background:linear-gradient(180deg,#ffffff,#f2f2f2);
-}
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
-.hero h1{
-font-size:52px;
-margin-bottom:20px;
-}
+    .container {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+    }
 
-.hero p{
-font-size:20px;
-max-width:600px;
-margin:auto;
-color:#555;
-}
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(248, 245, 255, 0.72);
+      border-bottom: 1px solid rgba(123, 92, 240, 0.08);
+    }
 
-.button{
-display:inline-block;
-margin-top:30px;
-padding:14px 28px;
-background:black;
-color:white;
-border-radius:8px;
-text-decoration:none;
-font-weight:600;
-}
+    .site-header-inner {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
 
-.section{
-padding:80px 20px;
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 1.15rem;
+    }
 
-.features{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:30px;
-margin-top:40px;
-}
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--gradient);
+      color: white;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-soft);
+      font-size: 1.2rem;
+    }
 
-.feature{
-background:white;
-padding:30px;
-border-radius:12px;
-box-shadow:0 5px 20px rgba(0,0,0,0.05);
-}
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
 
-.feature h3{
-margin-top:0;
-}
+    .nav a:hover {
+      color: var(--purple);
+    }
 
-.footer{
-text-align:center;
-padding:40px;
-color:#666;
-font-size:14px;
-}
+    .hero-wrap {
+      padding: 36px 0 24px;
+    }
 
-a{
-color:black;
-text-decoration:none;
-}
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 36px;
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 28px 80px rgba(123, 92, 240, 0.20);
+      padding: 72px 34px 44px;
+      isolation: isolate;
+    }
 
-</style>
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: -1;
+    }
 
+    .hero::before {
+      width: 420px;
+      height: 420px;
+      right: -80px;
+      top: -120px;
+      background: rgba(255, 255, 255, 0.12);
+      filter: blur(20px);
+    }
+
+    .hero::after {
+      width: 300px;
+      height: 300px;
+      left: -80px;
+      bottom: -120px;
+      background: rgba(255, 255, 255, 0.10);
+      filter: blur(12px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+      font-weight: 850;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 620px;
+      font-size: clamp(1rem, 1.7vw, 1.18rem);
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .store-badge {
+      width: 210px;
+      max-width: 100%;
+      filter: drop-shadow(0 10px 20px rgba(34, 27, 56, 0.18));
+      transition: transform 0.18s ease;
+    }
+
+    .store-badge:hover {
+      transform: translateY(-2px);
+    }
+
+    .ghost-pill {
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: white;
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .phone-card {
+      width: min(100%, 410px);
+      padding: 14px;
+      border-radius: 34px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 24px 60px rgba(34, 27, 56, 0.18);
+      backdrop-filter: blur(8px);
+    }
+
+    .phone-card img {
+      width: 100%;
+      border-radius: 24px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .section {
+      padding: 68px 0;
+    }
+
+    .section-header {
+      max-width: 720px;
+      margin: 0 auto 28px;
+      text-align: center;
+    }
+
+    .section-header h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.9rem, 3vw, 2.8rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .section-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .feature-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(123, 92, 240, 0.18), rgba(255, 169, 108, 0.20));
+      color: var(--purple);
+    }
+
+    .feature-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 12px;
+    }
+
+    .timeline-step {
+      background: white;
+      border: 1px solid rgba(123, 92, 240, 0.10);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+    }
+
+    .timeline-step-number {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--gradient);
+      color: white;
+      font-weight: 800;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .timeline-step h3 {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+    }
+
+    .timeline-step p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .preview-shell {
+      margin-top: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.35));
+      border: 1px solid rgba(123, 92, 240, 0.10);
+      border-radius: 30px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .preview-grid img {
+      width: 100%;
+      border-radius: 22px;
+      box-shadow: 0 18px 35px rgba(42, 28, 88, 0.12);
+      background: white;
+    }
+
+    .cta {
+      border-radius: 34px;
+      overflow: hidden;
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 28px 70px rgba(123, 92, 240, 0.18);
+      padding: 42px 28px;
+      text-align: center;
+    }
+
+    .cta h2 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      letter-spacing: -0.03em;
+    }
+
+    .cta p {
+      margin: 0 auto;
+      max-width: 680px;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 1.05rem;
+    }
+
+    .cta .hero-actions {
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .site-footer {
+      padding: 34px 0 48px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .site-footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    .site-footer a:hover {
+      color: var(--purple);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .feature-grid,
+      .timeline,
+      .preview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 58px 22px 32px;
+      }
+
+      .hero-visual {
+        margin-top: 8px;
+      }
+
+      .section {
+        padding: 54px 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .site-header-inner {
+        min-height: 68px;
+      }
+
+      .nav {
+        display: none;
+      }
+
+      .container {
+        width: min(100% - 20px, 1160px);
+      }
+
+      .hero-wrap {
+        padding-top: 20px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .store-badge {
+        width: 200px;
+      }
+
+      .feature-card,
+      .timeline-step {
+        padding: 22px;
+      }
+
+      .preview-shell {
+        padding: 14px;
+        border-radius: 24px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark">♥</div>
+        <span>Aligna</span>
+      </a>
 
-<div class="hero">
+      <nav class="nav">
+        <a href="#how-it-works">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#preview">Preview</a>
+      </nav>
+    </div>
+  </header>
 
-<h1>Aligna</h1>
+  <main>
+    <section class="hero-wrap">
+      <div class="container">
+        <div class="hero">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <div class="eyebrow">Private sessions • AI insights • Shared reflection</div>
 
-<p>
-Discover deeper relationship insights through guided conversations and AI-powered reflections.
-</p>
+              <h1>Discover deeper relationship insight with Aligna.</h1>
 
-<a href="#">
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
-style="width:220px;margin-top:30px;">
-</a>
+              <p>
+                Create private sessions, answer meaningful questions together, and unlock
+                beautifully guided compatibility insights in a calm, premium experience.
+              </p>
 
-</div>
+              <div class="hero-actions">
+                <a href="#">
+                  <img
+                    class="store-badge"
+                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                    alt="Get it on Google Play"
+                  />
+                </a>
+                <div class="ghost-pill">Built for thoughtful couples</div>
+              </div>
+            </div>
 
-<div class="section container">
+            <div class="hero-visual">
+              <div class="phone-card">
+                <img src="gemini_1.png" alt="Aligna app preview" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<h2>How Aligna Works</h2>
+    <section id="how-it-works" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>How Aligna works</h2>
+          <p>
+            A simple, thoughtful flow designed to help couples reflect, understand each
+            other better, and grow through guided conversations.
+          </p>
+        </div>
 
-<div class="features">
+        <div class="timeline">
+          <div class="timeline-step">
+            <div class="timeline-step-number">1</div>
+            <h3>Start a private session</h3>
+            <p>
+              Create a secure session and invite your partner with a simple code or link.
+            </p>
+          </div>
 
-<div class="feature">
-<h3>Guided Sessions</h3>
-<p>
-Answer meaningful questions together designed to spark deeper conversations.
-</p>
-</div>
+          <div class="timeline-step">
+            <div class="timeline-step-number">2</div>
+            <h3>Answer guided questions</h3>
+            <p>
+              Explore meaningful topics together through calm, structured modules at your
+              own pace.
+            </p>
+          </div>
 
-<div class="feature">
-<h3>AI Relationship Insights</h3>
-<p>
-Get intelligent summaries that highlight patterns, strengths, and growth areas.
-</p>
-</div>
+          <div class="timeline-step">
+            <div class="timeline-step-number">3</div>
+            <h3>See insights and results</h3>
+            <p>
+              Track progress, compare perspectives, and unlock AI-powered relationship
+              reflections.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<div class="feature">
-<h3>Track Progress</h3>
-<p>
-Watch how your relationship evolves as you complete sessions together.
-</p>
-</div>
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Why couples love Aligna</h2>
+          <p>
+            Thoughtful design, deeper reflection, and a premium experience built around
+            meaningful conversations.
+          </p>
+        </div>
 
-</div>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>Guided conversations</h3>
+            <p>
+              Answer beautifully structured questions that surface real perspectives,
+              values, and expectations.
+            </p>
+          </div>
 
-</div>
+          <div class="feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>AI relationship insights</h3>
+            <p>
+              Turn your shared answers into compatibility summaries, patterns, and deeper
+              reflection points.
+            </p>
+          </div>
 
-<div class="section container">
+          <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>Progress you can see</h3>
+            <p>
+              Follow your live progress, revisit sessions, and understand how your answers
+              align over time.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<h2>Why Couples Love Aligna</h2>
+    <section id="preview" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>App preview</h2>
+          <p>
+            Explore Aligna’s soft gradient visual style, premium cards, and focused
+            relationship flow.
+          </p>
+        </div>
 
-<div class="section container">
+        <div class="preview-shell">
+          <div class="preview-grid">
+            <img src="gemini_1.png" alt="Aligna screenshot 1" />
+            <img src="gemini_2.png" alt="Aligna screenshot 2" />
+            <img src="gemini_3.png" alt="Aligna screenshot 3" />
+            <img src="gemini_4.png" alt="Aligna screenshot 4" />
+          </div>
+        </div>
+      </div>
+    </section>
 
-<h2>App Preview</h2>
+    <section class="section">
+      <div class="container">
+        <div class="cta">
+          <h2>Start your next relationship conversation with Aligna.</h2>
+          <p>
+            Built to help couples explore compatibility, communicate more clearly, and
+            reflect together in a calm, beautifully designed experience.
+          </p>
 
-<div class="features">
+          <div class="hero-actions">
+            <a href="#">
+              <img
+                class="store-badge"
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-<img src="screenshot1.png" style="width:100%;border-radius:20px;">
-<img src="screenshot2.png" style="width:100%;border-radius:20px;">
-<img src="screenshot3.png" style="width:100%;border-radius:20px;">
-
-</div>
-
-</div>
-
-<div class="features">
-
-<div class="feature">
-<h3>Deeper Understanding</h3>
-<p>
-Explore values, expectations, and perspectives you might not normally discuss.
-</p>
-</div>
-
-<div class="feature">
-<h3>Strengthen Communication</h3>
-<p>
-Build healthier communication habits through guided reflection.
-</p>
-</div>
-
-<div class="feature">
-<h3>Meaningful Growth</h3>
-<p>
-Turn conversations into real relationship growth.
-</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="footer">
-
-<p>
-© 2026 Aligna
-</p>
-
-<p>
-<a href="/privacy.html">Privacy Policy</a> |
-<a href="/terms.html">Terms of Service</a>
-</p>
-
-</div>
-
+  <footer class="site-footer">
+    <div class="container">
+      <div>© 2026 Aligna</div>
+      <div class="site-footer-links">
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
