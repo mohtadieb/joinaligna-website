@@ -1,126 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Email Confirmed - Aligna</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{
-font-family:Arial;
-background:#F8F5FF;
-display:flex;
-align-items:center;
-justify-content:center;
-height:100vh;
-margin:0;
-}
-
-.card{
-background:white;
-border-radius:24px;
-padding:40px;
-max-width:500px;
-text-align:center;
-box-shadow:0 20px 40px rgba(0,0,0,0.08);
-}
-
-.button{
-display:inline-block;
-background:linear-gradient(135deg,#7B5CF0,#E96BD2,#FFA96C);
-color:white;
-font-weight:700;
-padding:16px 24px;
-border-radius:14px;
-text-decoration:none;
-margin-top:20px;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aligna — Email confirmed</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #F8F5FF;
+      color: #1f172b;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: white;
+      border: 1px solid #F0EAFB;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.06);
+    }
+    .hero {
+      padding: 36px 28px;
+      color: white;
+      text-align: center;
+      background: linear-gradient(135deg,#7B5CF0,#E96BD2,#FFA96C);
+    }
+    .content {
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg,#7B5CF0,#E96BD2,#FFA96C);
+      color: white;
+      font-weight: 700;
+      padding: 16px 26px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 16px;
+      box-shadow: 0 10px 22px rgba(123,92,240,0.25);
+      border: 0;
+      cursor: pointer;
+    }
+    .muted {
+      color: #666;
+      line-height: 1.5;
+    }
+    .footer {
+      padding: 20px 28px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      border-top: 1px solid #F0EAFB;
+    }
+    .hidden {
+      display: none;
+    }
+    .small {
+      font-size: 13px;
+      color: #7a7288;
+      margin-top: 16px;
+      word-break: break-word;
+    }
+    .debug {
+      text-align: left;
+      background: #faf7ff;
+      border: 1px solid #eee6ff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 12px;
+      color: #5a5270;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <div class="hero">
+      <img
+        src="https://joinaligna.com/aligna_inapp_icon.png"
+        width="64"
+        height="64"
+        alt="Aligna"
+        style="display:block;margin:0 auto 16px auto;border:0;"
+      />
+      <div style="font-size:30px;font-weight:800;line-height:1.1;">
+        Confirming your email
+      </div>
+      <div style="margin-top:10px;font-size:15px;line-height:1.5;">
+        Please wait while we complete your Aligna confirmation.
+      </div>
+    </div>
 
-<div class="card">
+    <div class="content">
+      <p id="status" class="muted">Processing your confirmation link...</p>
 
-<h1 id="title">Confirming your email...</h1>
-<p id="status">Please wait.</p>
+      <div id="successBox" class="hidden">
+        <p style="font-size:22px;font-weight:800;margin-bottom:10px;">Email confirmed</p>
+        <p class="muted">Your email has been confirmed. You can now sign in.</p>
+        <div style="margin-top:22px;">
+          <a id="openAppBtn" class="button" href="aligna://auth-callback">Open Aligna app</a>
+        </div>
+      </div>
 
-<div id="success" style="display:none">
+      <div id="errorBox" class="hidden">
+        <p style="font-size:22px;font-weight:800;margin-bottom:10px;">Could not confirm email</p>
+        <p id="errorText" class="muted">This link may have expired, already been used, or is invalid.</p>
+      </div>
 
-<h2>Email confirmed</h2>
-<p>You can now sign in to Aligna.</p>
+      <div id="debugText" class="debug hidden"></div>
+    </div>
 
-<a class="button" href="aligna://auth-callback">
-Open Aligna App
-</a>
+    <div class="footer">
+      Aligna — Relationship compatibility & guided sessions
+    </div>
+  </div>
 
-</div>
+  <script>
+    const SUPABASE_URL = 'https://YOUR_PROJECT_REF.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_REAL_ANON_PUBLIC_KEY';
 
-<div id="error" style="display:none">
+    const debugEl = document.getElementById('debugText');
+    const statusEl = document.getElementById('status');
+    const successBox = document.getElementById('successBox');
+    const errorBox = document.getElementById('errorBox');
+    const errorText = document.getElementById('errorText');
 
-<h2>Confirmation failed</h2>
-<p>This confirmation link may be expired or already used.</p>
+    function debug(message, obj) {
+      debugEl.classList.remove('hidden');
+      const line = obj ? `${message}\n${JSON.stringify(obj, null, 2)}` : message;
+      debugEl.textContent += (debugEl.textContent ? '\n\n' : '') + line;
+      console.log(message, obj || '');
+    }
 
-</div>
+    const { createClient } = window.supabase;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-</div>
+    const params = new URLSearchParams(window.location.search);
+    const token_hash = params.get('token_hash');
+    const type = params.get('type');
 
-<script>
+    debug('Loaded params', {
+      href: window.location.href,
+      token_hash_present: !!token_hash,
+      type
+    });
 
-const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"
-const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY"
+    async function confirmEmail() {
+      if (!token_hash || !type) {
+        statusEl.classList.add('hidden');
+        errorBox.classList.remove('hidden');
+        errorText.textContent = 'Missing token or type in the confirmation URL.';
+        debug('Missing URL params', { token_hash, type });
+        return;
+      }
 
-const supabase = window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_ANON_KEY
-)
+      try {
+        debug('Calling verifyOtp', { type, token_hash });
 
-const params = new URLSearchParams(window.location.search)
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash,
+          type
+        });
 
-const token_hash = params.get("token_hash")
-const type = params.get("type")
+        if (error) {
+          throw error;
+        }
 
-async function confirmEmail(){
+        debug('verifyOtp success', data);
 
-try{
+        statusEl.classList.add('hidden');
+        successBox.classList.remove('hidden');
 
-const { error } = await supabase.auth.verifyOtp({
-type: type,
-token_hash: token_hash
-})
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+          setTimeout(() => {
+            window.location.href = 'aligna://auth-callback';
+          }, 500);
+        }
+      } catch (err) {
+        statusEl.classList.add('hidden');
+        errorBox.classList.remove('hidden');
+        errorText.textContent = err?.message || 'This link may be invalid or expired.';
+        debug('verifyOtp failed', {
+          message: err?.message,
+          name: err?.name,
+          status: err?.status,
+          code: err?.code
+        });
+      }
+    }
 
-if(error){
-throw error
-}
-
-document.getElementById("status").style.display="none"
-document.getElementById("success").style.display="block"
-
-openAppIfMobile()
-
-}catch(e){
-
-document.getElementById("status").style.display="none"
-document.getElementById("error").style.display="block"
-
-}
-
-}
-
-function openAppIfMobile(){
-
-const isMobile =
-/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-
-if(!isMobile) return
-
-window.location.href="aligna://auth-callback"
-
-}
-
-confirmEmail()
-
-</script>
-
+    confirmEmail();
+  </script>
 </body>
 </html>
