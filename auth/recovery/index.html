@@ -6,8 +6,6 @@
 
 <title>Aligna — Reset password</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 
 body{
@@ -129,7 +127,7 @@ type="password"
 placeholder="Confirm password"
 />
 
-<button class="button" onclick="updatePassword()">
+<button class="button" id="updateBtn">
 Update password
 </button>
 
@@ -171,35 +169,32 @@ Aligna — Relationship compatibility & guided sessions
 
 </div>
 
-<script>
+<script type="module">
 
-const SUPABASE_URL = "https://nzpmyodqpxowncpbaoml.supabase.co"
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cG15b2RxcHhvd25jcGJhb21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMjY0OTUsImV4cCI6MjA4NjkwMjQ5NX0.-YiqTalaWDpN2xpHt3Ms7rbOPKnv1CXZ32Xud1oi8-8"
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const { createClient } = window.supabase
+const SUPABASE_URL = "https://nzpmyodqpxowncpbaoml.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
 
-const supabase = createClient(
-SUPABASE_URL,
-SUPABASE_ANON_KEY
-)
+const supabase = createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-const params = new URLSearchParams(window.location.search)
+const params = new URLSearchParams(window.location.search);
 
-const token_hash = params.get("token_hash")
-const type = params.get("type")
+const token_hash = params.get("token_hash");
+const type = params.get("type");
 
-const status = document.getElementById("status")
-const resetBox = document.getElementById("resetBox")
-const successBox = document.getElementById("successBox")
-const errorBox = document.getElementById("errorBox")
-const errorText = document.getElementById("errorText")
+const status = document.getElementById("status");
+const resetBox = document.getElementById("resetBox");
+const successBox = document.getElementById("successBox");
+const errorBox = document.getElementById("errorBox");
+const errorText = document.getElementById("errorText");
 
 async function verifyRecovery(){
 
 if(!token_hash){
-status.style.display="none"
-errorBox.style.display="block"
-return
+status.style.display="none";
+errorBox.classList.remove("hidden");
+return;
 }
 
 try{
@@ -207,18 +202,26 @@ try{
 const { error } = await supabase.auth.verifyOtp({
 token_hash,
 type
-})
+});
 
-if(error) throw error
+if(error) throw error;
 
-status.style.display="none"
-resetBox.style.display="block"
+status.style.display="none";
+resetBox.classList.remove("hidden");
+
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+if(isMobile){
+setTimeout(()=>{
+window.location.href="aligna://reset-password";
+},500);
+}
 
 }catch(err){
 
-status.style.display="none"
-errorBox.style.display="block"
-errorText.innerText = err.message
+status.style.display="none";
+errorBox.classList.remove("hidden");
+errorText.innerText = err.message;
 
 }
 
@@ -226,29 +229,31 @@ errorText.innerText = err.message
 
 async function updatePassword(){
 
-const p1 = document.getElementById("password1").value
-const p2 = document.getElementById("password2").value
+const p1 = document.getElementById("password1").value;
+const p2 = document.getElementById("password2").value;
 
 if(!p1 || p1 !== p2){
-alert("Passwords do not match")
-return
+alert("Passwords do not match");
+return;
 }
 
 const { error } = await supabase.auth.updateUser({
 password:p1
-})
+});
 
 if(error){
-alert(error.message)
-return
+alert(error.message);
+return;
 }
 
-resetBox.style.display="none"
-successBox.style.display="block"
+resetBox.classList.add("hidden");
+successBox.classList.remove("hidden");
 
 }
 
-verifyRecovery()
+document.getElementById("updateBtn").addEventListener("click",updatePassword);
+
+verifyRecovery();
 
 </script>
 
