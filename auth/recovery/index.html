@@ -1,27 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Password Reset - Aligna</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<title>Aligna — Reset password</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 body{
-font-family:Arial;
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
 background:#F8F5FF;
+color:#1f172b;
 display:flex;
+min-height:100vh;
 align-items:center;
 justify-content:center;
-height:100vh;
-margin:0;
+padding:24px;
 }
 
 .card{
+width:100%;
+max-width:560px;
 background:white;
-border-radius:24px;
-padding:40px;
-max-width:500px;
+border:1px solid #F0EAFB;
+border-radius:28px;
+overflow:hidden;
+box-shadow:0 14px 40px rgba(0,0,0,0.06);
+}
+
+.hero{
+padding:36px 28px;
+color:white;
 text-align:center;
-box-shadow:0 20px 40px rgba(0,0,0,0.08);
+background:linear-gradient(135deg,#7B5CF0,#E96BD2,#FFA96C);
+}
+
+.content{
+padding:32px 28px;
+text-align:center;
+}
+
+.input{
+width:100%;
+padding:14px;
+margin-top:10px;
+border-radius:12px;
+border:1px solid #E8E3F5;
+font-size:15px;
 }
 
 .button{
@@ -29,37 +58,197 @@ display:inline-block;
 background:linear-gradient(135deg,#7B5CF0,#E96BD2,#FFA96C);
 color:white;
 font-weight:700;
-padding:16px 24px;
+padding:16px 26px;
 border-radius:14px;
 text-decoration:none;
-margin-top:20px;
+font-size:16px;
+box-shadow:0 10px 22px rgba(123,92,240,0.25);
+border:0;
+cursor:pointer;
+margin-top:16px;
 }
-</style>
 
+.muted{
+color:#666;
+line-height:1.5;
+}
+
+.footer{
+padding:20px 28px;
+text-align:center;
+font-size:12px;
+color:#999;
+border-top:1px solid #F0EAFB;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="card">
 
-<h1>Reset your password</h1>
+<div class="hero">
 
-<p>If you opened this on your phone we will open the Aligna app.</p>
+<img src="https://joinaligna.com/aligna_inapp_icon.png"
+width="64"
+height="64"
+style="display:block;margin:0 auto 16px auto;border:0;"/>
+
+<div style="font-size:30px;font-weight:800;">
+Reset your password
+</div>
+
+<div style="margin-top:10px;font-size:15px;">
+Enter a new password for your Aligna account.
+</div>
+
+</div>
+
+<div class="content">
+
+<p id="status" class="muted">
+Checking your reset link...
+</p>
+
+<div id="resetBox" class="hidden">
+
+<input id="password1"
+class="input"
+type="password"
+placeholder="New password"
+/>
+
+<input id="password2"
+class="input"
+type="password"
+placeholder="Confirm password"
+/>
+
+<button class="button" onclick="updatePassword()">
+Update password
+</button>
+
+</div>
+
+<div id="successBox" class="hidden">
+
+<p style="font-size:22px;font-weight:800;">
+Password updated
+</p>
+
+<p class="muted">
+You can now log in to Aligna with your new password.
+</p>
 
 <a class="button" href="aligna://reset-password">
-Open Aligna App
+Open Aligna app
 </a>
+
+</div>
+
+<div id="errorBox" class="hidden">
+
+<p style="font-size:22px;font-weight:800;">
+Reset failed
+</p>
+
+<p id="errorText" class="muted">
+The reset link may be expired or invalid.
+</p>
+
+</div>
+
+</div>
+
+<div class="footer">
+Aligna — Relationship compatibility & guided sessions
+</div>
 
 </div>
 
 <script>
 
-const isMobile =
-/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co"
+const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY"
 
-if(isMobile){
-window.location.href="aligna://reset-password"
+const { createClient } = window.supabase
+
+const supabase = createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+)
+
+const params = new URLSearchParams(window.location.search)
+
+const token_hash = params.get("token_hash")
+const type = params.get("type")
+
+const status = document.getElementById("status")
+const resetBox = document.getElementById("resetBox")
+const successBox = document.getElementById("successBox")
+const errorBox = document.getElementById("errorBox")
+const errorText = document.getElementById("errorText")
+
+async function verifyRecovery(){
+
+if(!token_hash){
+status.style.display="none"
+errorBox.style.display="block"
+return
 }
+
+try{
+
+const { error } = await supabase.auth.verifyOtp({
+token_hash,
+type
+})
+
+if(error) throw error
+
+status.style.display="none"
+resetBox.style.display="block"
+
+}catch(err){
+
+status.style.display="none"
+errorBox.style.display="block"
+errorText.innerText = err.message
+
+}
+
+}
+
+async function updatePassword(){
+
+const p1 = document.getElementById("password1").value
+const p2 = document.getElementById("password2").value
+
+if(!p1 || p1 !== p2){
+alert("Passwords do not match")
+return
+}
+
+const { error } = await supabase.auth.updateUser({
+password:p1
+})
+
+if(error){
+alert(error.message)
+return
+}
+
+resetBox.style.display="none"
+successBox.style.display="block"
+
+}
+
+verifyRecovery()
 
 </script>
 
