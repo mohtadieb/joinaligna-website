@@ -1,1 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Email Confirmed - Aligna</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<style>
+body{
+font-family:Arial;
+background:#F8F5FF;
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh;
+margin:0;
+}
+
+.card{
+background:white;
+border-radius:24px;
+padding:40px;
+max-width:500px;
+text-align:center;
+box-shadow:0 20px 40px rgba(0,0,0,0.08);
+}
+
+.button{
+display:inline-block;
+background:linear-gradient(135deg,#7B5CF0,#E96BD2,#FFA96C);
+color:white;
+font-weight:700;
+padding:16px 24px;
+border-radius:14px;
+text-decoration:none;
+margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Confirming your email...</h1>
+
+<p id="status">Please wait...</p>
+
+<div id="success" style="display:none">
+
+<h2>Email confirmed</h2>
+
+<p>You can now sign in to Aligna.</p>
+
+<a class="button" href="aligna://auth-callback">
+Open Aligna App
+</a>
+
+</div>
+
+<div id="error" style="display:none">
+
+<h2>Link expired</h2>
+
+<p>This confirmation link may have already been used.</p>
+
+</div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"
+const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY"
+
+const supabase = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+)
+
+const params = new URLSearchParams(window.location.search)
+
+const token_hash = params.get("token_hash")
+const type = params.get("type")
+
+async function confirmEmail(){
+
+try{
+
+const { error } = await supabase.auth.verifyOtp({
+type: type,
+token_hash: token_hash
+})
+
+if(error){
+throw error
+}
+
+document.getElementById("status").style.display="none"
+document.getElementById("success").style.display="block"
+
+tryOpenApp()
+
+}catch(e){
+
+document.getElementById("status").style.display="none"
+document.getElementById("error").style.display="block"
+
+}
+
+}
+
+function tryOpenApp(){
+
+const isMobile =
+/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+if(!isMobile) return
+
+window.location.href="aligna://auth-callback"
+
+}
+
+confirmEmail()
+
+</script>
+
+</body>
+</html>
