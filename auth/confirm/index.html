@@ -42,14 +42,12 @@ margin-top:20px;
 
 <div class="card">
 
-<h1>Confirming your email...</h1>
-
-<p id="status">Please wait...</p>
+<h1 id="title">Confirming your email...</h1>
+<p id="status">Please wait.</p>
 
 <div id="success" style="display:none">
 
 <h2>Email confirmed</h2>
-
 <p>You can now sign in to Aligna.</p>
 
 <a class="button" href="aligna://auth-callback">
@@ -60,9 +58,8 @@ Open Aligna App
 
 <div id="error" style="display:none">
 
-<h2>Link expired</h2>
-
-<p>This confirmation link may have already been used.</p>
+<h2>Confirmation failed</h2>
+<p>This confirmation link may be expired or already used.</p>
 
 </div>
 
@@ -71,11 +68,11 @@ Open Aligna App
 <script>
 
 const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"
-const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY"
+const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY"
 
 const supabase = window.supabase.createClient(
 SUPABASE_URL,
-SUPABASE_KEY
+SUPABASE_ANON_KEY
 )
 
 const params = new URLSearchParams(window.location.search)
@@ -99,7 +96,7 @@ throw error
 document.getElementById("status").style.display="none"
 document.getElementById("success").style.display="block"
 
-tryOpenApp()
+openAppIfMobile()
 
 }catch(e){
 
@@ -110,7 +107,7 @@ document.getElementById("error").style.display="block"
 
 }
 
-function tryOpenApp(){
+function openAppIfMobile(){
 
 const isMobile =
 /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
